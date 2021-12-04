@@ -8,14 +8,14 @@
 <link rel=preconnect href=https://fonts.googleapis.com>
 <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400&family=Fira+Sans&display=swap" rel=stylesheet>
-<link href=css/interactive-image.min.css rel=stylesheet>
+<link href=/amr-lb/css/interactive-image.min.css rel=stylesheet>
 <script type=text/javascript src=js/jquery.min.js></script>
 <script type=text/javascript src=js/interactive-image.min.js></script>
 <link rel=stylesheet type=text/css href=js/tikzjax/fonts.css>
 <script src=js/tikzjax/tikzjax.js></script>
 <link rel=stylesheet href=/amr-lb/reveal-js/reset.css>
 <link rel=stylesheet href=/amr-lb/reveal-js/reveal.css><link rel=stylesheet href=/amr-lb/reveal-js/theme/black.css id=theme>
-<link rel=stylesheet href=/amr-lb/highlight-js/dracula.min.css><link rel=stylesheet href=/amr-lb/stylesheets/custom.css id=custom_css>
+<link rel=stylesheet href=/amr-lb/highlight-js/a11y-light.min.css><link rel=stylesheet href=/amr-lb/css/customized.css id=custom_css>
 </head>
 <body>
 <div class=reveal>
@@ -25,8 +25,8 @@
 <p>Holger Marschall,<br>
 Mohammed Elwardi Fadeli</p>
 <p>12/2021</p>
-</section><section>
-<div style=height:10%></div>
+</section>
+<section><div style=height:10%></div>
 <div class=columns-container>
 <div class=col style=width:30%;float:left;padding:60px>
 <img data-src=images/profile.png>
@@ -39,7 +39,7 @@ Mohammed Elwardi Fadeli</p>
 <li>Msc. in Petroleum Engineering <!-- .element: style="font-size: 0.8em;" --></li>
 <li>Maintainer of an OpenFOAM-based Reservoir Engineering Toolkit (OpenRSR) <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.8em;"-->
 <ul>
-<li>Which provides <strong>coupled solvers</strong> for Black-Oil Equations <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.8em;"--></li>
+<li>Which provides coupled solvers for Black-Oil Equations <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.7em;"--></li>
 </ul>
 </li>
 <li>LFCE-certified (Linux Engineer) who likes frictions with Math problems <!-- .element: class="fragment" data-fragment-index="3"  style="font-size: 0.8em;"-->
@@ -49,12 +49,13 @@ Mohammed Elwardi Fadeli</p>
 </div>
 </div>
 </section><section>
-<h2 id=well-be-discussing->We&rsquo;ll be discussing &mldr;</h2>
+<h3 id=well-be-discussing->We&rsquo;ll be discussing &mldr;</h3>
 <ol>
 <li>Adaptive Polyhedral Mesh Refinement</li>
 <li>Dynamic Load-balancing applied to chemistry and AMR</li>
 </ol>
-</section><section>
+</section>
+<section data-noprocess data-shortcode-slide data-background-image=images/bg-amr.png>
 <h1 id=native-adaptive-mesh-refinement>Native Adaptive Mesh Refinement</h1>
 </section><section>
 <h2 id=why-would-we-opt-for-amr>Why would we opt for AMR?</h2>
@@ -76,9 +77,9 @@ Mohammed Elwardi Fadeli</p>
 </section>
 </section><section>
 <ul>
-<li>Potential for unattended and cheap accuracy increase:
+<li>AMR Has potential for local (cheap) accuracy increase:
 <ol>
-<li>Start solving on coarse mesh</li>
+<li>Start solving on coarse meshes</li>
 <li>Compute discretization errors</li>
 <li>Refine where errors are high</li>
 <li>Repeat 1-3 until errors fall under a certain tolerance value</li>
@@ -171,9 +172,9 @@ Mohammed Elwardi Fadeli</p>
 </section><section>
 <h2 id=whats-already-available>What&rsquo;s already available?</h2>
 <ul>
-<li>OpenFOAM has a mature Hex-based adaptive refinement engine</li>
+<li>OpenFOAM has a mature <a href=https://github.com/OpenFOAM/OpenFOAM-dev/tree/master/src/dynamicMesh/polyTopoChange/polyTopoChange/hexRef8>Hex-based adaptive refinement engine</a></li>
 <li>Professors Jasak & Vuko have laid the foundation for polyhedral adaptive refinement
-in Foam-Extend 4, nextRelease branch</li>
+in Foam-Extend 4, <a href=https://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0/tree/nextRelease/src/dynamicMesh/topoChangerFvMesh/dynamicPolyRefinementFvMesh>nextRelease branch</a></li>
 </ul>
 </section><section>
 <h2 id=what-were-bringing-to-the-table>What we’re bringing to the table?</h2>
@@ -187,12 +188,16 @@ in Foam-Extend 4, nextRelease branch</li>
 </ul>
 </section>
 <section data-noprocess data-shortcode-slide data-background-color=white>
-<h3 id=interface-tracking-refinement-br15k-cells-initial-mesh-85k>Interface-tracking refinement <br>(15k cells, initial mesh: 8.5k)</h3>
-<img style=width:90%;margin:0;padding:0;position-top:0 data-src=images/alpha1.png>
+<h3 id=interface-tracking-refinement>Interface-tracking refinement</h3>
+<p><video style="display:block;margin:0 auto;padding:0" data-autoplay src=videos/interface.webm></video></p>
+</section>
+<section data-noprocess data-shortcode-slide data-background-color=white>
+<h3 id=interface-tracking-refinement-bruniformly-fine-mesh-51k>Interface-tracking refinement <br>(Uniformly fine mesh: +51k)</h3>
+<img style=width:85%;margin:0;padding:0;position-top:0 data-src=images/cell_count.png>
 </section><section>
 <p style=text-align:center>Interface-tracking refinement</p>
 <section data-auto-animate data-auto-animate-unmatched=false>
-<pre class=code-wapper data-id=code-animation><code class="language-foam hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-3,5,7>
+<pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-3,5,7>
 
 <span class=hljs-title>dynamicFvMesh</span> dynamicPolyRefinementFvMesh<span class=hljs-punctuation>;</span>
 <span class=hljs-type>dynamicRefineFvMeshCoeffs</span> <span class=hljs-punctuation>{</span>
@@ -205,7 +210,7 @@ in Foam-Extend 4, nextRelease branch</li>
 </code></pre>
 </section>
 <section data-auto-animate data-auto-animate-unmatched=false>
-<pre class=code-wapper data-id=code-animation><code class="language-foam hljs" data-trim data-noescape data-auto-animate data-line-numbers=3-10>
+<pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=3-10>
 
 <span class=hljs-title>dynamicFvMesh</span> dynamicPolyRefinementFvMesh<span class=hljs-punctuation>;</span>
 <span class=hljs-type>dynamicRefineFvMeshCoeffs</span> <span class=hljs-punctuation>{</span>
@@ -224,7 +229,7 @@ in Foam-Extend 4, nextRelease branch</li>
 </code></pre>
 </section>
 <section data-auto-animate data-auto-animate-unmatched=false>
-<pre class=code-wapper data-id=code-animation><code class="language-foam hljs" data-trim data-noescape data-auto-animate data-line-numbers=5-11>
+<pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=5-11>
 
 <span class=hljs-title>dynamicFvMesh</span> dynamicPolyRefinementFvMesh<span class=hljs-punctuation>;</span>
 <span class=hljs-type>dynamicRefineFvMeshCoeffs</span> <span class=hljs-punctuation>{</span>
@@ -242,7 +247,7 @@ in Foam-Extend 4, nextRelease branch</li>
 </code></pre>
 </section>
 <section data-auto-animate data-auto-animate-unmatched=false>
-<pre class=code-wapper data-id=code-animation><code class="language-foam hljs" data-trim data-noescape data-auto-animate data-line-numbers=7-12,14>
+<pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=7-12,14>
 
 <span class=hljs-title>dynamicFvMesh</span> dynamicPolyRefinementFvMesh<span class=hljs-punctuation>;</span>
 <span class=hljs-type>dynamicRefineFvMeshCoeffs</span> <span class=hljs-punctuation>{</span>
@@ -265,7 +270,7 @@ in Foam-Extend 4, nextRelease branch</li>
 </code></pre>
 </section>
 <section data-auto-animate data-auto-animate-unmatched=false>
-<pre class=code-wapper data-id=code-animation><code class="language-foam hljs" data-trim data-noescape data-auto-animate data-line-numbers=7,10-18>
+<pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=7,10-18>
 
 <span class=hljs-title>dynamicFvMesh</span> dynamicPolyRefinementFvMesh<span class=hljs-punctuation>;</span>
 <span class=hljs-type>dynamicRefineFvMeshCoeffs</span> <span class=hljs-punctuation>{</span>
@@ -306,7 +311,7 @@ in Foam-Extend 4, nextRelease branch</li>
 </ul>
 </section><section>
 <h3 id=user-supplied-code-for-refinement-selection>User-supplied code for refinement selection</h3>
-<pre class=code-wapper data-id=code-animation><code class="language-foam hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-6|9-15|17-29|31-43|45-51|54-56>
+<pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-6|9-15|17-29|31-43|45-51|54-56>
 
 <span class=hljs-type>refineBasedOnResiduals</span>
 <span class=hljs-punctuation>{</span>
@@ -373,19 +378,20 @@ in Foam-Extend 4, nextRelease branch</li>
 <section data-noprocess data-shortcode-slide data-background-color=white>
 <h3 id=multi-criteria-refinement-process-per-timestep>Multi-Criteria Refinement process (per timeStep)</h3>
 <section data-transition=fade-out>
-<img style=scale:.85 data-src=images/17.png>
+<img style=scale:.8 data-src=images/17.png>
 </section>
 <section data-transition="fade-in fade-out">
-<img style=scale:.85 data-src=images/18.png>
+<img style=scale:.8 data-src=images/18.png>
 </section>
 <section data-transition="fade-in fade-out">
-<img style=scale:.85 data-src=images/19.png>
+<img style=scale:.8 data-src=images/19.png>
 </section>
 </section><section>
 <h3 id=multi-criteria-refinement-process-per-timestep-1>Multi-Criteria Refinement process (per timeStep)</h3>
 <script type=text/javascript>var items=[{type:"text",title:"Cell Level 0",description:"Initial cell size",position:{left:170,top:90}},{type:"text",title:"Cell Level 1",description:"",position:{left:185,top:180}},{type:"text",title:"Cell Level 2",description:"",position:{left:250,top:155}},{type:"text",title:"Cell Level 3",description:"Max refinement level",position:{left:350,top:170}}],options={allowHtml:!0};$(document).ready(function(){$("#my-interactive-image").interactiveImage(items,options)})</script>
 <div id=my-interactive-image style=margin:auto;width:800px;height:463px;border-radius:8px;background-size:cover;background-image:url(images/levels.png)></div>
-</section><section>
+</section>
+<section data-noprocess data-shortcode-slide data-background-image=images/bg-lb.png>
 <h1 id=load-balancing>Load Balancing</h1>
 </section><section>
 <h3 id=load-balance-the-mesh-after-topology-changes>Load-Balance the mesh after topology changes</h3>
@@ -406,7 +412,7 @@ imbalance with respect to cell-count</p>
 </li>
 </ul>
 </section><section>
-<pre class=code-wapper data-id=code-animation><code class="language-foam hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-3,13|4|5-12>
+<pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-3,13|4|5-12>
 
 <span class=hljs-title>dynamicFvMesh</span> loadBalanceDynamicPolyRefinementFvMesh<span class=hljs-punctuation>;</span>
 <span class=hljs-type>loadBalanceFvMeshCoeffs</span>
@@ -423,6 +429,10 @@ imbalance with respect to cell-count</p>
 <span class=hljs-punctuation>}</span>
 
 </code></pre>
+</section>
+<section data-noprocess data-shortcode-slide data-background-color=white>
+<h3 id=dynamically-load-balance-after-amr-operations>Dynamically load-balance after AMR operations</h3>
+<p><video style="display:block;margin:0 auto;padding:0" data-autoplay src=videos/loadbalance.webm></video></p>
 </section><section>
 <h3 id=load-balance-chemistry-problems>Load Balance chemistry problems</h3>
 <p>What Bulut Tekgul et al. did with <strong><a href=https://github.com/Aalto-CFD/DLBFoam>DLBFoam</a></strong>:</p>
@@ -436,9 +446,9 @@ imbalance with respect to cell-count</p>
 </ul>
 </section><section>
 <p style=text-align:center>An example of DLBFoam run with the Hex-based adaptive refinement engine (courtesy of Bulut)</p>
-<video style=scale:.85;margin:0;padding:0 data-autoplay src=videos/dlbfoam.mp4></video>
-</section><section>
-<h1 id=next-steps>Next steps</h1>
+<video style="scale:.85;display:block;margin:0 auto;padding:0" data-autoplay src=videos/dlbfoam.webm></video>
+</section>
+<section><h1 id=next-steps>Next steps</h1>
 <ul>
 <li>Algebraic form of AMR
 <ul>
@@ -449,7 +459,7 @@ imbalance with respect to cell-count</p>
 </section>
 </div>
 </div>
-<script type=application/json id=reveal-hugo-site-params>{"custom_css":"/stylesheets/custom.css","highlight_theme":"dracula","width":"1200"}</script>
+<script type=application/json id=reveal-hugo-site-params>{"custom_css":"css/customized.css","highlight_theme":"a11y-light","width":"1200"}</script>
 <script type=application/json id=reveal-hugo-page-params>null</script>
 <script src=/amr-lb/reveal-js/reveal.js></script>
 <script type=text/javascript src=/amr-lb/reveal-js/plugin/markdown/markdown.js></script>

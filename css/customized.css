@@ -24,6 +24,12 @@
   margin: 30px 0;
 }
 
+.reveal h1 {
+  background-color: rgba(31, 49, 81, 0.8);
+  padding: 20px;
+  color: white;
+}
+
 .reveal h2 {
   background-color: green;
   padding: 10px;
@@ -31,7 +37,7 @@
 }
 
 .reveal h3 {
-  background-color: green;
+  background-color: #0b5394;
   padding: 10px;
   text-transform: none;
 }
