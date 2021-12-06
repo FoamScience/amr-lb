@@ -300,17 +300,17 @@ in Foam-Extend 4, <a href=https://github.com/Unofficial-Extend-Project-Mirror/fo
 </section>
 </section><section>
 <h3 id=more-refinementunrefinement-criteria>More refinement/unrefinement criteria</h3>
-<p>In addition to the interface refinement criterion, we have developed:</p>
-<ul>
-<li>Error-driven refinement selection criteria
-<ul>
-<li>local residual error estimate</li>
-<li>local discretisation error estimate</li>
-</ul>
-</li>
-<li>further field-based refinement selection criteria: <em>values, gradient</em> and/or <em>curl</em></li>
-<li>User-supplied (dynamic) code for refinement selection</li>
-</ul>
+<div style="height=1em">
+<section data-markdown>
+<script type=text/template>
+In addition to the interface refinement criterion, we have developed:
+- Error-driven refinement selection criteria <!-- .element: style="font-size: 0.9em;"-->
+    - local residual error estimate<!-- .element: style="font-size: 0.8em;"-->
+    - local discretisation error estimate<!-- .element: style="font-size: 0.8em;"-->
+- further field-based refinement selection criteria: _values, gradient_ and/or _curl_<!-- .element: style="font-size: 0.9em;"-->
+- User-supplied (dynamic) code for refinement selection<!-- .element: style="font-size: 0.9em;"-->
+</script>
+</section>
 </section><section>
 <h3 id=user-supplied-code-for-refinement-selection>User-supplied code for refinement selection</h3>
 <pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-6|9-15|17-29|31-43|45-51|54-56>
@@ -449,6 +449,35 @@ imbalance with respect to cell-count</p>
 </section><section>
 <p style=text-align:center>An example of DLBFoam run with the Hex-based adaptive refinement engine (courtesy of Bulut, Argonne National Labs)</p>
 <video style="scale:.85;display:block;margin:0 auto;padding:0" data-autoplay src=videos/dlbfoam.webm></video>
+</section><section>
+<h3 id=load-balancing-for-particle-simulations>Load-Balancing for particle simulations</h3>
+<p>A simplistic approach was adopted in <a href=https://www.sciencedirect.com/science/article/pii/S0010465517303363>mdFoam+</a>
+by S.M. Longshaw et al. to balance particles count</p>
+<pre><code class=language-cpp data-line-numbers=7-8|10,13,15|21-22>if ( Pstream::parRun() )
+{
+    const scalar&amp; allowableImbalance = maxImbalance_;
+        
+    //First determine current level of imbalance - do this for all
+    // parallel runs, even if balancing is disabled
+    scalar nGlobalParticles = cloud_.size();
+    Foam::reduce(nGlobalParticles, sumOp&lt;scalar&gt;());
+    
+    scalar idealNParticles = scalar(nGlobalParticles)/scalar(Pstream::nProcs());
+    
+    scalar nParticles = cloud_.size();
+    scalar localImbalance = mag(nParticles - idealNParticles);
+    Foam::reduce(localImbalance, maxOp&lt;scalar&gt;());
+    scalar maxImbalance = localImbalance/idealNParticles;
+    
+    Info &lt;&lt; &quot;    Maximum imbalance = &quot; &lt;&lt; 100*maxImbalance &lt;&lt; &quot;%&quot; &lt;&lt; endl;
+    
+    if( maxImbalance &gt; allowableImbalance &amp;&amp; enableBalancing_)
+    {   
+        // Call reconstructPar and decomposeDSMCLoadBalancePar 
+        // on master
+    }
+}
+</code></pre>
 </section>
 <section><h1 id=next-steps>Next steps</h1>
 <ul>
