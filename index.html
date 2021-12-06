@@ -22,8 +22,8 @@
 <div class=slides>
 <section><h2 id=towards--dynamically--load-balanced-reactive-cfd-using-openfoam>Towards dynamically load-balanced reactive CFD using OpenFOAM</h2>
 <div style=height:10%></div>
-<p>Holger Marschall,<br>
-Mohammed Elwardi Fadeli</p>
+<p>Mohammed Elwardi Fadeli,<br>
+Holger Marschall</p>
 <p>12/2021</p>
 </section>
 <section><div style=height:10%></div>
@@ -37,11 +37,8 @@ Mohammed Elwardi Fadeli</p>
 <script type=text/template>
 <ul>
 <li>Msc. in Petroleum Engineering <!-- .element: style="font-size: 0.8em;" --></li>
-<li>Maintainer of an OpenFOAM-based Reservoir Engineering Toolkit (OpenRSR) <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.8em;"-->
-<ul>
-<li>Which provides coupled solvers for Black-Oil Equations <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.7em;"--></li>
-</ul>
-</li>
+<li>Maintainer of an OpenFOAM-based Reservoir Engineering Toolkit (OpenRSR, <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.8em;"-->
+providing coupled solvers for Black-Oil Equations) <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.7em;"--></li>
 <li>LFCE-certified (Linux Engineer) who likes frictions with Math problems <!-- .element: class="fragment" data-fragment-index="3"  style="font-size: 0.8em;"-->
 </script></li>
 </ul>
@@ -49,27 +46,31 @@ Mohammed Elwardi Fadeli</p>
 </div>
 </div>
 </section><section>
-<h3 id=well-be-discussing->We&rsquo;ll be discussing &mldr;</h3>
+<h3 id=outline>Outline</h3>
+<h4 id=unified-dynamic-load-balancing-dlb-framework-for-rcfd>Unified Dynamic Load-Balancing (DLB) Framework for rCFD</h4>
 <ol>
-<li>Adaptive Polyhedral Mesh Refinement</li>
-<li>Dynamic Load-balancing applied to chemistry and AMR</li>
+<li>Current Status:</li>
+</ol>
+<ul>
+<li>Transport equations: DLB and adaptive polyhedral mesh refinement</li>
+<li>Chemistry: DLB applied to chemical source terms (DLBFoam)</li>
+</ul>
+<ol start=2>
+<li>Future Steps</li>
 </ol>
 </section>
 <section data-noprocess data-shortcode-slide data-background-image=images/bg-amr.png>
-<h1 id=native-adaptive-mesh-refinement>Native Adaptive Mesh Refinement</h1>
+<h1 id=adaptive-mesh-refinement>Adaptive Mesh Refinement</h1>
 </section><section>
 <h2 id=why-would-we-opt-for-amr>Why would we opt for AMR?</h2>
 <section data-markdown>
 <script type=text/template>
 <ul>
-<li><strong>Dynamically</strong> densify the mesh in regions of interest (only) to increase solution accuracy
+<li><strong>Dynamically</strong> increase mesh resolution where needed, i.e. in moving regions of interest (locally maintain accuracy)</li>
+<li>Coarsen the mesh in smooth flow regions to save computation time but preserving local accuracy<!-- .element: class="fragment" data-fragment-index="3" -->
 <ul>
-<li>Uniformly fine meshes are usually expensive <!-- .element: class="fragment" data-fragment-index="2"  style="font-size: 0.8em;"--></li>
-</ul>
-</li>
-<li>Coarsen the mesh in other regions to save computation time <!-- .element: class="fragment" data-fragment-index="3" -->
-<ul>
-<li>Regions where no critical flow features are developing <!-- .element: class="fragment" data-fragment-index="3"  style="font-size: 0.8em;"-->
+<li>Uniformly fine meshes are usually too expensive <!-- .element: class="fragment" data-fragment-index="3"  style="font-size: 0.8em;"--></li>
+<li>Regions where no critical/fine flow features are developing <!-- .element: class="fragment" data-fragment-index="3"  style="font-size: 0.8em;"-->
 </script></li>
 </ul>
 </li>
@@ -77,19 +78,19 @@ Mohammed Elwardi Fadeli</p>
 </section>
 </section><section>
 <ul>
-<li>AMR Has potential for local (cheap) accuracy increase:
+<li>AMR Has potential for local (computationally cheap) accuracy increase:
 <ol>
 <li>Start solving on coarse meshes</li>
-<li>Compute discretization errors</li>
+<li>Compute discretization or residual errors</li>
 <li>Refine where errors are high</li>
-<li>Repeat 1-3 until errors fall under a certain tolerance value</li>
+<li>Repeat steps 1-3 until errors fall under a certain tolerance</li>
 <li>Pass to the next time step</li>
 </ol>
 </li>
 </ul>
 </section><section>
 <section data-noproecess>
-<h3> Geometric Multi-grid methods vs. AMR</h3>
+<h3> GMG methods vs. AMR</h3>
 <div class=tikz>
 <script type=text/tikz>
 \begin{tikzpicture}[every node/.style={scale=2.5}]
@@ -172,9 +173,9 @@ Mohammed Elwardi Fadeli</p>
 </section><section>
 <h2 id=whats-already-available>What&rsquo;s already available?</h2>
 <ul>
-<li>OpenFOAM has a mature <a href=https://github.com/OpenFOAM/OpenFOAM-dev/tree/master/src/dynamicMesh/polyTopoChange/polyTopoChange/hexRef8>Hex-based adaptive refinement engine</a></li>
-<li>Professors Jasak & Vuko have laid the foundation for polyhedral adaptive refinement
-in Foam-Extend 4, <a href=https://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0/tree/nextRelease/src/dynamicMesh/topoChangerFvMesh/dynamicPolyRefinementFvMesh>nextRelease branch</a></li>
+<li>OpenFOAM has a mature <a href=https://github.com/OpenFOAM/OpenFOAM-dev/tree/master/src/dynamicMesh/polyTopoChange/polyTopoChange/hexRef8>hex-based adaptive mesh refinement engine</a>, which has been enhanced by load-balancing in Darmstadt (<a href=https://doi.org/10.1016/j.softx.2019.100317>DOI: 10.1016/j.softx.2019.100317</a>)</li>
+<li>Foundation of polyhedral adaptive refinement
+in Foam-Extend 4, <a href=https://github.com/Unofficial-Extend-Project-Mirror/foam-extend-foam-extend-4.0/tree/nextRelease/src/dynamicMesh/topoChangerFvMesh/dynamicPolyRefinementFvMesh>nextRelease branch</a> (<a href=https://doi.org/10.4271/2019-24-0128>DOI: 10.4271/2019-24-0128</a>)</li>
 </ul>
 </section><section>
 <h2 id=what-were-bringing-to-the-table>What we’re bringing to the table?</h2>
@@ -183,19 +184,20 @@ in Foam-Extend 4, <a href=https://github.com/Unofficial-Extend-Project-Mirror/fo
 <ul>
 <li>Built on top of Foam-Extend&rsquo;s engine</li>
 <li>With support for cell-count based Load Balancing</li>
+<li>Multiple interface refinement selection criteria, e.g. interface/front criterion</li>
 </ul>
 </li>
 </ul>
 </section>
 <section data-noprocess data-shortcode-slide data-background-color=white>
-<h3 id=interface-tracking-refinement>Interface-tracking refinement</h3>
+<h3 id=interface-capturing-refinement>Interface-Capturing refinement</h3>
 <p><video style="display:block;margin:0 auto;padding:0" data-autoplay src=videos/interface.webm></video></p>
 </section>
 <section data-noprocess data-shortcode-slide data-background-color=white>
-<h3 id=interface-tracking-refinement-bruniformly-fine-mesh-51k>Interface-tracking refinement <br>(Uniformly fine mesh: +51k)</h3>
+<h3 id=interface-capturing-refinement-bruniformly-fine-mesh-51k>Interface-Capturing refinement <br>(Uniformly fine mesh: +51k)</h3>
 <img style=width:85%;margin:0;padding:0;position-top:0 data-src=images/cell_count.png>
 </section><section>
-<p style=text-align:center>Interface-tracking refinement</p>
+<p style=text-align:center>Interface-Capturing refinement</p>
 <section data-auto-animate data-auto-animate-unmatched=false>
 <pre class=code-wapper data-id=code-animation><code class="language-cpp hljs" data-trim data-noescape data-auto-animate data-line-numbers=1-3,5,7>
 
@@ -298,16 +300,16 @@ in Foam-Extend 4, <a href=https://github.com/Unofficial-Extend-Project-Mirror/fo
 </section>
 </section><section>
 <h3 id=more-refinementunrefinement-criteria>More refinement/unrefinement criteria</h3>
-<p>In addition to the interface refinement criterion, we can track:</p>
+<p>In addition to the interface refinement criterion, we have developed:</p>
 <ul>
-<li>The discretisation error</li>
-<li>Interesting ranges of field <em>values, gradient</em> and/or <em>curl</em></li>
-<li>User-supplied (dynamic) code for refinement selection</li>
+<li>Error-driven refinement selection criteria
+<ul>
+<li>local residual error estimate</li>
+<li>local discretisation error estimate</li>
 </ul>
-</section><section>
-<p>There is also support for ”<strong>mounting</strong>” these criteria on top of each other</p>
-<ul>
-<li>Unrefinement won’t interfere with the refined (and to-be refined) cells in the same timeStep</li>
+</li>
+<li>further field-based refinement selection criteria: <em>values, gradient</em> and/or <em>curl</em></li>
+<li>User-supplied (dynamic) code for refinement selection</li>
 </ul>
 </section><section>
 <h3 id=user-supplied-code-for-refinement-selection>User-supplied code for refinement selection</h3>
@@ -401,15 +403,11 @@ in Foam-Extend 4, <a href=https://github.com/Unofficial-Extend-Project-Mirror/fo
 <h3 id=load-balance-the-mesh-after-topology-changes>Load-Balance the mesh after topology changes</h3>
 <ul>
 <li>
-<p>Refinement methods generally &ldquo;unbalance&rdquo; local regions,
-generating load balancing issues.</p>
+<p>Refinement methods generally cause imbalance for static domain decomposition cases.</p>
 </li>
 <li>
 <p>The Load-Balancer engine in Foam-Extend can auto-sense processor
 imbalance with respect to cell-count</p>
-<ul>
-<li>Using a trigger coefficient</li>
-</ul>
 </li>
 <li>
 <p>It also tries to migrates adjacent cells between processors if possible</p>
@@ -438,27 +436,24 @@ imbalance with respect to cell-count</p>
 <h3 id=dynamically-load-balance-after-amr-operations>Dynamically load-balance after AMR operations</h3>
 <p><video style="display:block;margin:0 auto;padding:0" data-autoplay src=videos/loadbalance.webm></video></p>
 </section><section>
-<h3 id=load-balance-chemistry-problems>Load Balance chemistry problems</h3>
-<p>What Bulut Tekgul et al. did with <strong><a href=https://github.com/Aalto-CFD/DLBFoam>DLBFoam</a></strong>:</p>
+<h3 id=load-balanced-chemistry>Load-Balanced Chemistry</h3>
+<p>What Bulut Tekgul et al. have achieved with <strong><a href=https://github.com/Aalto-CFD/DLBFoam>DLBFoam</a></strong>:</p>
 <ul>
-<li>Load balance the number of <strong>Chemistry ODE problems</strong> across processes
+<li>Load balance the number of <strong>Chemistry ODE problems</strong> across processes (<a href=https://doi.org/10.1016/j.cpc.2021.108073>DOI: 10.1016/j.cpc.2021.108073</a>)
 <ul>
 <li>Solved independently during each CFD iteration</li>
-</ul>
-</li>
 <li>Employ reference solution mapping to (thermo-chemically) similar cells</li>
 </ul>
+</li>
+</ul>
 </section><section>
-<p style=text-align:center>An example of DLBFoam run with the Hex-based adaptive refinement engine (courtesy of Bulut)</p>
+<p style=text-align:center>An example of DLBFoam run with the Hex-based adaptive refinement engine (courtesy of Bulut, Argonne National Labs)</p>
 <video style="scale:.85;display:block;margin:0 auto;padding:0" data-autoplay src=videos/dlbfoam.webm></video>
 </section>
 <section><h1 id=next-steps>Next steps</h1>
 <ul>
-<li>Algebraic form of AMR
-<ul>
-<li>Run AMR with Multi-Grid solvers fully algebraically?</li>
-</ul>
-</li>
+<li>Dynamic Load-Balancing of particulate flows</li>
+<li>Devise a unified framework</li>
 </ul>
 </section>
 </div>
